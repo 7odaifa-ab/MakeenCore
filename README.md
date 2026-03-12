@@ -26,7 +26,7 @@
 
 ## 1. نظرة عامة
 
-**مكّن** مكتبة TypeScript تُوفّر:
+**مكين** مكتبة TypeScript تُوفّر:
 
 | الوظيفة | الوصف |
 |---|---|
@@ -57,6 +57,11 @@ src/
 │   ├── PlanContext.ts             # سياق كل يوم محاكاة (يُمرَّر للاستراتيجيات)
 │   ├── constants.ts               # Enums: TrackId, WindowMode
 │   └── types.ts                   # PlanDay, PlanEvent
+│
+├── data/
+│   ├── QuranStaticData.ts         # مصفوفات البيانات الثابتة (O(1) lookups)
+│   ├── create_quranStaticData.py  # سكربت يولد البيانات من CSV
+│   └── ...                        # ملفات CSV (قاعدة البيانات الأولية)
 │
 ├── tracks/
 │   ├── BaseTrack.ts               # Abstract: state machine + commitStep
@@ -95,7 +100,7 @@ src/
 
 ```bash
 npm install
-npx ts-node src/main.ts
+npm start
 ```
 
 ### مثال كامل
@@ -290,7 +295,7 @@ const repo = QuranRepository.getInstance();
 | `getIndexFromLocation(surah, ayah, isReverse)` | O(1) | سورة:آية → index في المصفوفة التراكمية |
 | `getLocationFromIndex(index, indexMap)` | O(1) | index → سورة:آية |
 | `moveLocation(current, linesToAdd, isReverse)` | O(log k) | تحريك موقع بعدد أسطر |
-| `getLinesBetween(from, to, isReverse)` | O(1) | عدد الأسطر بين موقعين |
+| `getLinesBetween(from, to, direction)` | O(1) | عدد الأسطر بين موقعين |
 | `getSurahName(surahNum)` | O(1) | اسم السورة |
 | `getAyahCount(surahNum)` | O(1) | عدد الآيات في السورة |
 
@@ -300,7 +305,7 @@ const repo = QuranRepository.getInstance();
 const lines = repo.getLinesBetween(
     { surah: 2, ayah: 1 },    // من
     { surah: 2, ayah: 286 },  // إلى (شامل)
-    false                      // isReverse
+    'auto'                    // direction (الافتراضي: 'auto' لتحديد الاتجاه تلقائياً)
 );
 // → 712.5 سطر
 
@@ -315,10 +320,11 @@ const rev = repo.getLinesBetween(
 > **الخوارزمية:** `lines = cumArray[endIdx] - cumArray[startIdx - 1]`
 > — عمليتا قراءة + طرح واحد. O(1) لا يُحسَّن أكثر.
 > `|abs|` يضمن صحة النتيجة بصرف النظر عن ترتيب المدخلين.
+> القيمة الافتراضية للاتجاه هي `'auto'` والتي تستنتج الاتجاه تلقائياً بناءً على الترتيب النسبي للموقعين.
 
 ---
 
-## 7. نظام الأخطاء — Error System
+## 6. نظام الأخطاء — Error System
 
 جميع الأخطاء `instanceof Error` وتحمل بنية موحدة:
 
@@ -368,7 +374,7 @@ try {
 
 ---
 
-## 8. سيناريوهات الاستخدام
+## 7. سيناريوهات الاستخدام
 
 ### سيناريو 1: حفظ جديد فقط
 
@@ -421,8 +427,7 @@ const repo = QuranRepository.getInstance();
 // كم سطراً في جزء عم؟
 const lines = repo.getLinesBetween(
     { surah: 78, ayah: 1 },   // النبأ
-    { surah: 114, ayah: 6 },  // الناس
-    false
+    { surah: 114, ayah: 6 }   // الناس (يتم استنتاج الاتجاه تلقائياً)
 );
 ```
 
@@ -455,8 +460,8 @@ npx ts-node src/tests/planErrors.test.ts
 | 1 | PlanError: instanceof، الحقول، warn() |
 | 2 | أخطاء Builder: MISSING_SCHEDULE، MODE_MIXING، START_AFTER_END، MAJOR_REVIEW_AHEAD |
 | 3 | أخطاء البيانات: INVALID_LOCATION (3 حالات + context) |
-| 4 | Fix 1 — currentIdx ≤ globalMax بعد اكتمال الحفظ |
-| 5 | Fix 3 — WindowStrategy تقرأ تاريخ Hifz بشكل صحيح |
+| 5 | Fix 1 — currentIdx ≤ globalMax بعد اكتمال الحفظ |
+| 6 | Fix 3 — WindowStrategy تقرأ تاريخ Hifz بشكل صحيح |
 
 ---
 
