@@ -1,9 +1,9 @@
-import { PlanConfig } from '../entities/PlanConfig';
+import { PlanDefinition } from '../entities/PlanConfig';
 import { PlanDay } from '../../../core/types';
 
 export interface PlanRecord {
     id: string;
-    config: PlanConfig;
+    config: PlanDefinition;
     days: PlanDay[];
     createdAt: Date;
     updatedAt: Date;

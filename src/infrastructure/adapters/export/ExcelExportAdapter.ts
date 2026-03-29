@@ -22,7 +22,7 @@ export class ExcelExportAdapter {
 
     public async generateBuffer(plan: PlanDay[], options?: ExportOptions): Promise<Buffer> {
         const workbook = this.createWorkbook(plan, options);
-        return (await workbook.xlsx.writeBuffer()) as Buffer;
+        return (await workbook.xlsx.writeBuffer()) as unknown as Buffer;
     }
 
     public async export(plan: PlanDay[], options?: ExportOptions): Promise<void> {
@@ -41,7 +41,7 @@ export class ExcelExportAdapter {
         });
 
         // Dynamic Columns based on present tracks in the plan
-        const allTrackIds = new Set<string>();
+        const allTrackIds = new Set<string | number>();
         for (const day of plan) {
             for (const event of day.events) {
                 allTrackIds.add(event.trackId);
@@ -55,7 +55,7 @@ export class ExcelExportAdapter {
         ];
 
         // Track Name mapping
-        const trackNames: Record<string, string> = {
+        const trackNames: Record<string | number, string> = {
             [TrackId.HIFZ]: 'الحفظ الجديد',
             [TrackId.MINOR_REVIEW]: 'مراجعة صغرى',
             [TrackId.MAJOR_REVIEW]: 'مراجعة كبرى'
@@ -64,8 +64,8 @@ export class ExcelExportAdapter {
         const activeTrackOrder = Array.from(allTrackIds).sort();
         for (const trackId of activeTrackOrder) {
             columns.push({
-                header: trackNames[trackId] || trackId,
-                key: trackId,
+                header: trackNames[trackId] || trackId.toString(),
+                key: trackId.toString(),
                 width: 35
             });
         }
@@ -94,11 +94,12 @@ export class ExcelExportAdapter {
 
             for (const trackId of activeTrackOrder) {
                 const event = day.events.find(e => e.trackId === trackId);
+                const stringTrackId = trackId.toString();
                 if (event) {
                     const status = event.data.is_reset ? ' 🔄' : '';
-                    rowData[trackId] = `${this.formatLocation(event.data.start)} ⬅️ ${this.formatLocation(event.data.end)}${status}`;
+                    rowData[stringTrackId] = `${this.formatLocation(event.data.start)} ⬅️ ${this.formatLocation(event.data.end)}${status}`;
                 } else {
-                    rowData[trackId] = '';
+                    rowData[stringTrackId] = '';
                 }
             }
 
@@ -116,8 +117,9 @@ export class ExcelExportAdapter {
             }
             // Warning resets
             for (const trackId of activeTrackOrder) {
-                if (rowData[trackId] && rowData[trackId].includes('🔄')) {
-                    const colIndex = columns.findIndex(c => c.key === trackId) + 1;
+                const stringTrackId = trackId.toString();
+                if (rowData[stringTrackId] && rowData[stringTrackId].includes('🔄')) {
+                    const colIndex = columns.findIndex(c => c.key === stringTrackId) + 1;
                     const cell = row.getCell(colIndex);
                     cell.font = { color: { argb: 'FFC0392B' }, bold: true };
                 }
