@@ -6,6 +6,12 @@ import { QuranRepository } from './QuranRepository'; // Type only!
 import { DateUtils } from '../utils/DateUtils';
 import { PlanDay, PlanEvent } from './types';
 import { EventType } from './constants'; // 👈 Import Enum
+import { RuleEngine } from '../domain/planning/rules/RuleEngine';
+import { RuleContext, RuleCandidate } from '../domain/planning/rules/RuleInterface';
+import { AyahIntegrityRule } from '../domain/planning/rules/handlers/AyahIntegrityRule';
+import { SurahSnapRule } from '../domain/planning/rules/handlers/SurahSnapRule';
+import { PageAlignmentRule } from '../domain/planning/rules/handlers/PageAlignmentRule';
+import { ReferenceRepository } from '../domain/mushaf/repositories/ReferenceRepository';
 
 export interface ManagerConfig {
     startDate: string;
@@ -29,12 +35,19 @@ export class TrackManager {
     private constraintManager: ConstraintManager;
     private stopCondition: StopCondition | null = null;
 
+    private ruleEngine: RuleEngine;
+
     // 🚀 DI: Repository is injected, not instantiated
     constructor(
         private config: ManagerConfig,
         private quranRepo: QuranRepository
     ) {
         this.constraintManager = new ConstraintManager();
+        this.ruleEngine = new RuleEngine([
+            new AyahIntegrityRule(),
+            new SurahSnapRule(),
+            new PageAlignmentRule()
+        ]);
     }
 
     addTrack(track: ITrack) {
@@ -104,9 +117,41 @@ export class TrackManager {
             // WindowStrategy depends on Hifz history already being committed before it runs.
             // Sorting here makes that invariant explicit and safe regardless of addTrack() order.
             for (const track of [...this.tracks.values()].sort((a, b) => a.id - b.id)) {
-                const step = track.calculateNextStep(dayContext);
+                const rawStep = track.calculateNextStep(dayContext);
 
-                if (step) {
+                if (rawStep) {
+                    // Epic 2: Pass candidate through rule pipeline
+                    const candidate: RuleCandidate = {
+                        start: rawStep.start,
+                        proposedEnd: rawStep.end,
+                        targetLines: rawStep.linesProcessed,
+                        isReverse: this.config.isReverse
+                    };
+
+                    const ruleContext: RuleContext = {
+                        repository: ReferenceRepository.getInstance(),
+                        trackId: track.id,
+                        snapThresholdLines: 7 // default threshold
+                    };
+
+                    const ruleResult = this.ruleEngine.evaluate(candidate, ruleContext);
+
+                    // Rebuild step with approved end
+                    const approvedIdx = this.quranRepo.getIndexFromLocation(ruleResult.approvedEnd.surah, ruleResult.approvedEnd.ayah, this.config.isReverse);
+                    const finalLines = this.quranRepo.getLinesBetween(candidate.start, ruleResult.approvedEnd, this.config.isReverse);
+                    
+                    const step: typeof rawStep = {
+                        ...rawStep,
+                        end: ruleResult.approvedEnd,
+                        endIdx: approvedIdx,
+                        linesProcessed: finalLines,
+                        appliedRules: ruleResult.metadata ? ruleResult.metadata.appliedRule.split(', ') : [],
+                        snapReason: ruleResult.metadata?.reason,
+                        warnings: ruleResult.warnings,
+                        pageStart: candidate.start.page,
+                        pageEnd: ruleResult.approvedEnd.page
+                    };
+
                     track.commitStep(step, currentDate);
 
                     // 🚀 NEW: Generic Event Creation

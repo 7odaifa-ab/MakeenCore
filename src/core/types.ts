@@ -9,6 +9,8 @@ export interface LocationObj {
     surah: number;
     ayah: number;
     is_end: boolean;
+    page?: number;
+    is_page_end?: boolean;
 }
 
 /**
@@ -34,6 +36,11 @@ export interface StepResult {
     endIdx: number;
     linesProcessed: number;
     flags?: string[];
+    appliedRules?: string[];  // Epic 2: track applied rules
+    snapReason?: string;      // Epic 2: reason for adjustment
+    warnings?: string[];      // Epic 2: rule warnings
+    pageStart?: number;       // Epic 2: start page
+    pageEnd?: number;         // Epic 2: end page
 }
 
 /**

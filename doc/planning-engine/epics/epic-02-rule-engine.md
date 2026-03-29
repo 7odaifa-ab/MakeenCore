@@ -27,35 +27,35 @@ The current engine moves by lines, but the new product requires a formal rule pi
 ## Backend Tasks
 
 ### 1. Introduce planning rule abstractions
-- define rule interface
-- define rule context object
-- define rule candidate/result object
-- define explicit rule ordering
+- [x] define rule interface
+- [x] define rule context object
+- [x] define rule candidate/result object
+- [x] define explicit rule ordering
 
 ### 2. Implement rule handlers
-- `AyahIntegrityRule`
-- `SurahSnapRule`
-- `PageAlignmentRule`
-- `ThematicHaltingRule`
-- `BalanceCorrectionRule`
+- [x] `AyahIntegrityRule`
+- [x] `SurahSnapRule`
+- [x] `PageAlignmentRule`
+- [x] `ThematicHaltingRule`
+- [x] `BalanceCorrectionRule`
 
 ### 3. Enrich step results
-- add rule metadata
-- add snap reason
-- add page start/end fields
-- add warnings list
-- add applied rule list
+- [x] add rule metadata
+- [x] add snap reason
+- [x] add page start/end fields
+- [x] add warnings list
+- [x] add applied rule list
 
 ### 4. Integrate rule pipeline with track execution
-- run raw track movement first
-- pass candidate through rule pipeline
-- commit only final approved result
+- [x] run raw track movement first
+- [x] pass candidate through rule pipeline
+- [x] commit only final approved result
 
 ### 5. Add rule-specific tests
-- ensure no ayah is split
-- ensure end-of-surah snapping works within threshold
-- ensure page alignment threshold behavior is deterministic
-- ensure thematic stopping prefers valid boundaries
+- [x] ensure no ayah is split
+- [x] ensure end-of-surah snapping works within threshold
+- [x] ensure page alignment threshold behavior is deterministic
+- [x] ensure thematic stopping prefers valid boundaries
 
 ## Acceptance Criteria
 - The engine never outputs a partial ayah lesson

@@ -5,7 +5,7 @@ This folder contains the implementation starter documents for the next generatio
 ## Contents
 
 - `epic-01-domain-foundation.md` ✅ (Completed)
-- `epic-02-rule-engine.md`
+- `epic-02-rule-engine.md` ✅ (Completed)
 - `epic-03-multi-track-scheduling.md`
 - `epic-04-export-api-persistence.md`
 
