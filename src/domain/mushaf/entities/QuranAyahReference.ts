@@ -1,20 +1,39 @@
 /**
  * Canonical model for a single Ayah in the Mushaf.
  */
+export type ThematicBreakType = 'QUARTER' | 'HIZB' | 'JUZ' | 'SAJDAH' | 'NONE';
+
 export interface QuranAyahReference {
+    ayahId: number;
+    surahNumber: number;
+    ayahNumber: number;
+    pageNumber: number;
+    lineStart: number;
+    lineEnd: number;
+    linesCount: number;
+    thematicBreakType: ThematicBreakType;
     surah: number;
     ayah: number;
     lines: number;
     page: number;
     isSurahEnd: boolean;
     isPageEnd: boolean;
-    thematicBreak: boolean; // Rub, Hizb, Juz or thematic stop
+    thematicBreak: boolean;
 }
 
 /**
  * Payload for a directional index element.
  */
 export interface DirectionalIndexElement {
+    ayah_id?: number;
+    surah_number?: number;
+    ayah_number?: number;
+    page_number?: number;
+    line_start?: number;
+    line_end?: number;
+    lines_count?: number;
+    thematic_break_type?: ThematicBreakType;
+    thematic_break?: boolean;
     surah: number;
     ayah: number;
     is_end: boolean;

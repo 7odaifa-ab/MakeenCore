@@ -15,6 +15,14 @@ interface HafsVerse {
     aya_text_emlaey: string;
 }
 
+type ThematicBreakType = 'QUARTER' | 'SAJDAH' | 'NONE';
+
+function resolveThematicBreakType(ayahText: string): ThematicBreakType {
+    if (ayahText.includes('۞')) return 'QUARTER';
+    if (ayahText.includes('۩')) return 'SAJDAH';
+    return 'NONE';
+}
+
 export function generateHafsCanonicalDataset(jsonPath: string, outputPath: string) {
     if (!fs.existsSync(jsonPath)) {
         throw new Error(`Hafs JSON file not found at ${jsonPath}`);
@@ -58,8 +66,8 @@ export function generateHafsCanonicalDataset(jsonPath: string, outputPath: strin
         const isSurahEnd = (i === rawData.length - 1) || (rawData[i + 1].sora !== verse.sora);
         const isPageEnd = (i === rawData.length - 1) || (rawData[i + 1].page !== verse.page);
         
-        // Detect Thematic Break: ۞ for Rub, ۩ for Sajdah
-        const hasThematicMark = verse.aya_text.includes('۞') || verse.aya_text.includes('۩');
+        const thematicBreakType = resolveThematicBreakType(verse.aya_text);
+        const hasThematicMark = thematicBreakType !== 'NONE';
         
         // Calculate lines weight, handling shared lines proportionally
         let linesCount = 0;
@@ -71,14 +79,20 @@ export function generateHafsCanonicalDataset(jsonPath: string, outputPath: strin
         linesCount = Number(linesCount.toFixed(4));
 
         canonicalData.push({
+            ayahId: verse.id,
+            surahNumber: verse.sora,
+            ayahNumber: verse.aya_no,
+            pageNumber: verse.page,
             surah: verse.sora,
             ayah: verse.aya_no,
             page: verse.page,
             lineStart: verse.line_start,
             lineEnd: verse.line_end,
+            linesCount: linesCount,
             lines: linesCount,
             isSurahEnd,
             isPageEnd,
+            thematicBreakType,
             thematicBreak: hasThematicMark
         });
     }
@@ -97,11 +111,19 @@ export function generateHafsCanonicalDataset(jsonPath: string, outputPath: strin
         fwdCumArray.push(parseFloat(cumulativeProgress.toFixed(4)));
         fwdIdxMap[`${ayah.surah}:${ayah.ayah}`] = idx;
         fwdLocations.push({
+            ayah_id: ayah.ayahId,
+            surah_number: ayah.surahNumber,
+            ayah_number: ayah.ayahNumber,
+            page_number: ayah.pageNumber,
+            line_start: ayah.lineStart,
+            line_end: ayah.lineEnd,
+            lines_count: ayah.linesCount,
             surah: ayah.surah,
             ayah: ayah.ayah,
             page: ayah.page,
             is_end: ayah.isSurahEnd,
             is_page_end: ayah.isPageEnd,
+            thematic_break_type: ayah.thematicBreakType,
             thematic_break: ayah.thematicBreak
         });
     });
@@ -122,11 +144,19 @@ export function generateHafsCanonicalDataset(jsonPath: string, outputPath: strin
         revCumArray.push(parseFloat(revCumulativeProgress.toFixed(4)));
         revIdxMap[`${ayah.surah}:${ayah.ayah}`] = idx;
         revLocations.push({
+            ayah_id: ayah.ayahId,
+            surah_number: ayah.surahNumber,
+            ayah_number: ayah.ayahNumber,
+            page_number: ayah.pageNumber,
+            line_start: ayah.lineStart,
+            line_end: ayah.lineEnd,
+            lines_count: ayah.linesCount,
             surah: ayah.surah,
             ayah: ayah.ayah,
             page: ayah.page,
             is_end: ayah.isSurahEnd,
             is_page_end: ayah.isPageEnd,
+            thematic_break_type: ayah.thematicBreakType,
             thematic_break: ayah.thematicBreak
         });
     });
