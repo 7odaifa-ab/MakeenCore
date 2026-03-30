@@ -27,10 +27,10 @@ Status legend:
 
 | Requirement | Source | Status | Evidence | Gap |
 | --- | --- | --- | --- | --- |
-| Pipeline structure (`advanceByLines -> snapToAyahBoundary -> surah/page/thematic/balance`) | requirement + PRD §7.3, §10 | PARTIAL | `src/domain/planning/rules/RuleEngine.ts` and handlers under `src/domain/planning/rules/handlers/` | Rule engine exists, but not fully closed against all PRD invariants and traceability requirements for every step. |
+| Pipeline structure (`advanceByLines -> snapToAyahBoundary -> surah/page/thematic/balance`) | requirement + PRD §7.3, §10 | PARTIAL | `src/domain/planning/rules/RuleEngine.ts` and handlers under `src/domain/planning/rules/handlers/`; deterministic order exposed via `getRuleNamesInOrder()`; terminal stop enforced when surah end is reached | Pipeline hardening progressed, but full PRD invariants and balance-rule maturity are not fully complete yet. |
 | Ayah integrity (never cut ayah) | requirement + PRD §7.3 | PARTIAL | Rule handlers and tests exist in planning domain tests | Needs complete invariant suite proving all direction/edge cases. |
-| Surah snap threshold behavior | requirement + PRD §7.3 | PARTIAL | `src/domain/planning/rules/handlers/SurahSnapRule.ts` | Threshold behavior exists but needs full production-grade validation matrix and config-driven policy. |
-| Page alignment threshold behavior | requirement + PRD §7.3 | PARTIAL | `src/domain/planning/rules/handlers/PageAlignmentRule.ts` | Current implementation still includes approximation warnings and requires hardening with finalized canonical semantics. |
+| Surah snap threshold behavior | requirement + PRD §7.3 | PARTIAL | `src/domain/planning/rules/handlers/SurahSnapRule.ts`; validated by `src/tests/domain/planning/rule-engine.test.ts` (Vitest) | Core behavior verified, but threshold policy remains minimally configurable and needs broader matrix coverage. |
+| Page alignment threshold behavior | requirement + PRD §7.3 | PARTIAL | `src/domain/planning/rules/handlers/PageAlignmentRule.ts` now computes distance consistently and supports cross-surah page-boundary scanning; validated by `src/tests/domain/planning/rule-engine.test.ts` (Vitest) | Canonical semantics still need expanded reverse-direction and edge-threshold coverage. |
 | Thematic halting preference | requirement + PRD §7.3 | PARTIAL | Thematic marker info exists in dataset | No robust typed thematic stopping rule layer at full PRD level yet. |
 
 ---
@@ -50,8 +50,8 @@ Status legend:
 | Requirement | Source | Status | Evidence | Gap |
 | --- | --- | --- | --- | --- |
 | Dataset validation automated checks | requirement §4 + PRD §12.3, §14 | PASS | `src/tests/domain/mushaf/dataset-validation.test.ts` now validates continuity, page markers, typed thematic integrity, weighted page-line bounds, and forward/reverse symmetry | Remaining enhancements are optional hardening (additional edge assertions), not core-gap blockers. |
-| Rule-level tests and directional symmetry tests | PRD §14 | PARTIAL | Tests in `src/tests/domain/planning/` now include thematic-halting rule path and deterministic ordering checks | Still needs broader edge-case matrix for all threshold combinations and reverse scenarios. |
-| Structured test framework migration | PRD §14.3 | PARTIAL | `vitest` dependency and scripts added in `package.json` (`test:vitest`, `test:vitest:watch`) while legacy scripts remain available | Full migration pending conversion of script-style tests into Vitest test files. |
+| Rule-level tests and directional symmetry tests | PRD §14 | PARTIAL | `src/tests/domain/planning/rule-engine.test.ts` and `src/tests/domain/mushaf/dataset-validation.test.ts` are now Vitest suites and currently passing (10/10 combined) | Still needs broader edge-case matrix for all threshold combinations and reverse scenarios. |
+| Structured test framework migration | PRD §14.3 | PARTIAL | `vitest` installed and active in `package.json`; planning rule and dataset validation suites migrated to Vitest | Migration is in progress; remaining legacy script-style suites should be converted to Vitest. |
 
 ---
 
@@ -77,12 +77,113 @@ Implementation appears to be at:
 
 ## Priority Next Steps (P0 -> P2)
 
-1. **Harden rule pipeline**
-   - Complete rule-order invariants and edge-case tests (forward + reverse).
-   - Ensure page/surah/thematic snapping behaviors are fully verified in integration scenarios.
+1. **Expand rule hardening coverage**
+   - Keep current deterministic rule-order + terminal-surah behavior.
+   - Add reverse-direction and threshold-edge matrix tests for surah/page/thematic rules.
 
-2. **Complete Vitest migration**
-   - Convert current script-style tests into Vitest suites and run through `test:vitest` in CI/local flow.
+2. **Continue Vitest migration**
+   - Convert remaining script-style tests (starting with scheduling suites) into Vitest.
+   - Add a CI/local target that runs both migrated and transitional suites reliably.
 
 3. **Export-layer modernization**
    - Continue refactor toward adapter-based Excel/PDF export architecture and verify contract compatibility.
+
+---
+
+## 8) Latest Verified Execution Snapshot
+
+- `npm run test:vitest -- src/tests/domain/planning/rule-engine.test.ts src/tests/domain/mushaf/dataset-validation.test.ts` → PASS (10/10 tests)
+
+These runs confirm progress in Phase 2 hardening and QA migration while Phases 3–5 remain partially complete.
+
+---
+
+## 6) Phase Continuation Plan (Remaining Phases)
+
+### Phase 2 — Core Rule Engine (In Progress)
+
+**Objective**
+- Close all stopping-pipeline compliance gaps so step outputs are fully deterministic, explainable, and symmetric across directions.
+
+**Completion Criteria**
+- Rule order is fixed and explicitly tested (`advance -> ayah -> surah -> page -> thematic -> balance`).
+- Ayah integrity is guaranteed for forward and reverse movement under all threshold combinations.
+- Step output metadata includes rule trace (`appliedRules`, `snapReason`, warnings/flags where relevant).
+- Rule-level and integration tests pass for representative edge matrices.
+
+**Work Items**
+- Finalize invariants in `src/domain/planning/rules/RuleEngine.ts` and each rule handler.
+- Harden `SurahSnapRule` and `PageAlignmentRule` threshold semantics against PRD tolerance requirements.
+- Introduce/complete typed thematic halting behavior wired into the pipeline.
+- Expand test matrix in `src/tests/domain/planning/` for:
+  - near-boundary surah/page cases,
+  - reverse-direction parity,
+  - tolerance band violations and correction behavior.
+
+---
+
+### Phase 3 — Advanced Scheduling (Partial)
+
+**Objective**
+- Make multi-track scheduling fully policy-driven and pedagogically balanced with deterministic outcomes.
+
+**Completion Criteria**
+- Balancing configuration is consistently applied to all active track families.
+- Catch-up and off-day scheduling is integrated end-to-end (not only load-balancer-local logic).
+- Multi-track simulation remains deterministic with documented execution ordering.
+- Constraint safety holds (review cannot overtake memorized range, direction-safe barriers).
+
+**Work Items**
+- Integrate load-balancing policy with schedule-level orchestration and plan-day generation.
+- Complete catch-up day + holiday behavior across simulation and event rendering.
+- Expand mixed-track integration tests to include reverse plans and review-only variants.
+- Validate interaction between balancing and constraints in dense multi-track scenarios.
+
+---
+
+### Phase 4 — Export Layer (Partial)
+
+**Objective**
+- Deliver a stable adapter-based export boundary supporting operational Excel and printable PDF output.
+
+**Completion Criteria**
+- Export is refactored into clear adapters (Excel and PDF responsibilities separated).
+- Dynamic columns render correctly based on active tracks.
+- Off-day/catch-up visual states are preserved in exported artifacts.
+- PDF row integrity is guaranteed (single day not split unexpectedly).
+
+**Work Items**
+- Complete adapter refactor of the current export flow.
+- Implement/finish PDF adapter with printable layout constraints.
+- Add export-focused tests (structure checks and snapshot-style verification where appropriate).
+- Verify contract compatibility with `src/infrastructure/api/contracts.ts` export DTO shape.
+
+---
+
+### Phase 5 — Application Boundary Readiness (Draft/Not Started)
+
+**Objective**
+- Make the engine cleanly embeddable in future NestJS + Prisma service boundaries.
+
+**Completion Criteria**
+- Use-case level service interfaces are defined for preview/generate/estimate/export/validate flows.
+- DTO contracts remain stable and version-safe.
+- Persistence mapping strategy is documented against Prisma draft schema.
+- Integration test strategy exists for API + persistence boundaries.
+
+**Work Items**
+- Add application-layer ports/use-cases around the existing domain engine.
+- Define repository interfaces and mapping contracts for plan aggregate persistence.
+- Prepare integration guidelines from current TypeScript engine into NestJS modules.
+- Add targeted boundary tests for contract serialization and persistence mapping assumptions.
+
+---
+
+## 7) Suggested Delivery Sequence (From Current State)
+
+1. Finish Phase 2 rule hardening and full rule test matrix.
+2. Complete Phase 3 scheduling integration (balancing + catch-up/off-day).
+3. Finalize Phase 4 export adapter architecture and PDF readiness.
+4. Execute Phase 5 boundary preparation for API/persistence embedding.
+
+This sequence preserves dependency order and minimizes rework risk across planning, export, and integration layers.

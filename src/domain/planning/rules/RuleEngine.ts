@@ -19,6 +19,10 @@ export class RuleEngine {
         this.rules.sort((a, b) => a.priority - b.priority);
     }
 
+    public getRuleNamesInOrder(): string[] {
+        return this.rules.map((rule) => rule.name);
+    }
+
     /**
      * Executes the pipeline on a candidate location
      */
@@ -35,24 +39,28 @@ export class RuleEngine {
 
         for (const rule of this.rules) {
             const result = rule.apply(currentCandidate, context);
+            const locationChanged =
+                result.approvedEnd.surah !== currentCandidate.proposedEnd.surah ||
+                result.approvedEnd.ayah !== currentCandidate.proposedEnd.ayah;
+
+            if (result.metadata) {
+                appliedRules.push(result.metadata.appliedRule);
+                combinedReason.push(result.metadata.reason);
+                totalAdjustment += result.metadata.adjustmentLines;
+            }
             
             // If the rule modified the location
-            if (
-                result.approvedEnd.surah !== currentCandidate.proposedEnd.surah || 
-                result.approvedEnd.ayah !== currentCandidate.proposedEnd.ayah
-            ) {
+            if (locationChanged) {
                 currentCandidate.proposedEnd = result.approvedEnd;
                 finalResult.approvedEnd = result.approvedEnd;
-                
-                if (result.metadata) {
-                    appliedRules.push(result.metadata.appliedRule);
-                    combinedReason.push(result.metadata.reason);
-                    totalAdjustment += result.metadata.adjustmentLines;
-                }
             }
             
             if (result.warnings && result.warnings.length > 0) {
                 finalResult.warnings!.push(...result.warnings);
+            }
+
+            if (finalResult.approvedEnd.is_end) {
+                break;
             }
         }
 
