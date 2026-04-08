@@ -2,8 +2,8 @@ import { PlanningRule, RuleCandidate, RuleContext, RuleResult } from '../RuleInt
 
 export class PageAlignmentRule implements PlanningRule {
     /**
-     * ⚠️ WARNING: Page alignment is currently based on computed approximations ($Lines/15$).
-     * Standard Mushaf page boundaries are NOT yet integrated. Accuracy is low.
+     * NOW USING: Canonical Mushaf Dataset (Hafs v18) with authentic page boundaries.
+     * Page alignment now uses real Madinah Mushaf coordinates for production accuracy.
      */
     name = 'PageAlignmentRule';
 

@@ -4,11 +4,11 @@ import {
     SURAH_INFO,
     RAW_CUMULATIVE_ARRAY_FORWARD,
     INDEX_MAP_FORWARD,
-    REVERSE_INDEX_FORWARD, // 🚀 NEW: Import optimized lookup
+    REVERSE_INDEX_FORWARD, // NEW: Import optimized lookup
     RAW_CUMULATIVE_ARRAY_REVERSE,
     INDEX_MAP_REVERSE,
-    REVERSE_INDEX_REVERSE // 🚀 NEW: Import optimized lookup
-} from '../data/QuranStaticData';
+    REVERSE_INDEX_REVERSE // NEW: Import optimized lookup
+} from '../data/CanonicalQuranData';
 import { findExponentialStopIndex } from '../utils/Algorithms';
 import { PlanError, PlanErrorCode, Severity } from '../errors';
 
@@ -25,9 +25,9 @@ interface DirectionData {
 /**
  * QuranRepository (Singleton)
  * * Central data access layer for all Quran-related queries.
- * * ⚠️ WARNING: This repository serves APPROXIMATE data derived from a basic lines-only CSV.
- * * Page numbers and thematic markers are NOT grounded in a real Mushaf dataset.
- * * DO NOT USE for production rules until data is replaced with ground-truth.
+ * * NOW USING: Canonical Mushaf Dataset (Hafs v18) - Ground Truth data with real page boundaries and thematic markers.
+ * * ACCURACY: Page numbers, line boundaries, and thematic breaks are now grounded in authentic Madinah Mushaf coordinates.
+ * * READY FOR: Production rules with precise spatial calculations and domain-correct stopping behaviors.
  * * DESIGN PATTERNS:
  * - Singleton: One instance shared across all tracks
  * - Repository: Abstracts data storage from business logic

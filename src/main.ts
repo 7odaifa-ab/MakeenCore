@@ -26,8 +26,8 @@ async function main() {
             })
             // 🎯 سيناريو: حفظ سورة البقرة مع مراجعة
             .addHifz(
-                7.5,                       // الاسطر
-                { surah: 40, ayah: 2 }    // من
+                10,                        // lines per day
+                { surah: 66, ayah: 1 }     // from Surah At-Tahrim
             )
             .addMinorReview(5, WindowMode.GRADUAL)            // مراجعة 5 دروس (صغرى)
             .addMajorReview(15 * 20, { surah: 67, ayah: 1 })           // مراجعة 20 وجه (كبرى)

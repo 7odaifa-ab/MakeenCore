@@ -5,8 +5,8 @@ import { PlanDefinition, TrackDefinition, TrackType, PlanDirection } from '../..
 
 /**
  * PlanMapper
- * ⚠️ WARNING: Maps plans based on potentially technically incorrect page/line data.
- * Accuracy cannot be guaranteed until the underlying Quranic dataset is finalized.
+ * NOW USING: Canonical Mushaf Dataset (Hafs v18) - Ground Truth data for accurate mapping.
+ * Production-ready with authentic page boundaries and line coordinates from Madinah Mushaf.
  */
 export class PlanMapper {
 

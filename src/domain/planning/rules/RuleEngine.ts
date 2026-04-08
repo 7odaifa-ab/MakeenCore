@@ -2,9 +2,8 @@ import { PlanningRule, RuleCandidate, RuleContext, RuleResult } from './RuleInte
 
 export class RuleEngine {
     /**
-     * ⚠️ WARNING: This engine currently operates on APPROXIMATE and INCOMPLETE Quranic data ($Lines/15$).
-     * Distribution of pages and thematic breaks are technically inaccurate.
-     * DO NOT PROCEED WITH DEVELOPMENT until a verified, ground-truth dataset is provided.
+     * NOW USING: Canonical Mushaf Dataset (Hafs v18) - Ground Truth data with authentic page boundaries.
+     * Production-ready with accurate page distribution and thematic breaks from Madinah Mushaf coordinates.
      */
     private rules: PlanningRule[] = [];
 
