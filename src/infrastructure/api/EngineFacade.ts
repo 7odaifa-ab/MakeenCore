@@ -55,7 +55,8 @@ export class EngineFacade {
                     case 'MAJOR_REVIEW':
                         builder.addMajorReview(
                             track.amountValue,
-                            track.start ? { surah: track.start.surah, ayah: track.start.ayah } : undefined
+                            track.start ? { surah: track.start.surah, ayah: track.start.ayah } : undefined,
+                            track.end ? { surah: track.end.surah, ayah: track.end.ayah } : undefined
                         );
                         break;
                     default:

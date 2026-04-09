@@ -235,6 +235,11 @@ export class TrackManager {
                         pageEnd: ruleResult.approvedEnd.page
                     };
 
+                    // 🛡️ Guard: If RuleEngine truncated the step, it might not be completed yet!
+                    if (approvedIdx < rs.endIdx && step.flags) {
+                        step.flags = step.flags.filter(f => f !== 'completed');
+                    }
+
                     track.commitStep(step, currentDate);
 
                     // 🚀 NEW: Generic Event Creation
@@ -242,15 +247,9 @@ export class TrackManager {
                     let eType = EventType.REVIEW;
                     if (track.type === 'linear') eType = EventType.MEMORIZATION;
 
-                    // Correct Canonical Order: Reverse direction tracks moving backwards
-                    // Review tracks should display seamlessly in Mushaf order.
+                    // Correct Canonical Order
                     let eStart = step.start;
                     let eEnd = step.end;
-                    
-                    if (track.type === 'looping' && this.config.isReverse) {
-                        eStart = step.end;
-                        eEnd = step.start;
-                    }
 
                     const event: PlanEvent = {
                         trackId: track.id,

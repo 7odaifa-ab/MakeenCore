@@ -4,105 +4,91 @@ import { PlanContext } from '../core/PlanContext';
 import { findExponentialStopIndex } from '../utils/Algorithms';
 
 /**
- * LoopingStrategy
+ * LoopingStrategy — State-Driven Major Review
  * 
- * For Major Review: continuous cycling with barrier awareness.
+ * ARCHITECTURE FIX: This strategy now implements a **state-driven pointer**
+ * instead of rule-driven generation.
  * 
  * BEHAVIOR:
- * - Moves forward by fixed amount
- * - Stops at "wall" (constraint from other tracks)
- * - Resets to 0 when hitting end or wall
+ * 1. Pointer starts at configured startIdx (e.g. Surah An-Nas)
+ * 2. Each day: pointer += dailyAmount (one single chunk)
+ * 3. If pointer reaches the wall (memorized boundary): RESET
+ *    - Emit the partial chunk up to the wall
+ *    - Flag 'reset' so commitStep wraps pointer to startIdx
+ *    - Next day starts fresh from startIdx
+ * 4. **NEVER produce multiple chunks in one day** — prevents
+ *    multi-track confusion and inconsistent direction
+ * 
+ * This ensures:
+ * - Consistent ASC direction within each cycle
+ * - One Major Review event per day
+ * - Predictable coverage cycles
+ * - Reset ONLY when pointer >= wall (real cycle completion)
  */
 export class LoopingStrategy implements IMovementStrategy {
     calculateNextStep(
         state: TrackState, 
         context: PlanContext, 
-        config: { amount: number, trackId: number }
-    ): StepResult | StepResult[] | null {
-        let results: StepResult[] = [];
-        let currentIdx = state.currentIdx;
-        let amountLeft = config.amount;
-        let didReset = false;
-
+        config: { amount: number, trackId: number, endIdx?: number, startIdx?: number }
+    ): StepResult | null {
+        const currentIdx = state.currentIdx;
         const maxIndex = context.cumulativeArray.length - 1;
 
-        // Check for barrier (wall constraint)
-        const meTrack = context.allTracks.get(config.trackId);
+        // Determine the wall (boundary of memorized material)
         let wallIdx = maxIndex;
-        
-        if (meTrack) {
-            const barrier = context.constraintManager.getBarrierIndex(meTrack, context.allTracks);
-            if (barrier !== null) {
-                wallIdx = barrier;
-            }
-        }
-
-        let iterations = 0;
-        const originalStartIdx = currentIdx;
-
-        // Loop to fulfill the daily amount, slicing over multiple chunks if we hit boundaries
-        while (amountLeft >= 5 && iterations < 3) {
-            iterations++;
-            // Calculate target
-            const currentCum = currentIdx > 0 ? context.cumulativeArray[currentIdx - 1] : 0;
-            const targetCum = currentCum + amountLeft;
-
-            const effectiveSearchLimit = Math.min(wallIdx, maxIndex);
-            if (effectiveSearchLimit <= 0) break; // Nothing to review, pool is empty
-
-            let stopIdx = findExponentialStopIndex(
-                context.cumulativeArray,
-                targetCum,
-                currentIdx,
-                effectiveSearchLimit
-            );
-
-            // Check if we hit the wall
-            let hitWall = false;
-            
-            if (stopIdx >= wallIdx) {
-                stopIdx = wallIdx;
-                hitWall = true;
-            }
-            
-            if (stopIdx === maxIndex && wallIdx === maxIndex) {
-                hitWall = true;
-            }
-
-            // Silence logic: if no movement possible
-            if (stopIdx === currentIdx) {
-                hitWall = true;
-                if (results.length > 0) {
-                     break; // we already did some work, just stop.
+        if (config.endIdx !== undefined) {
+            wallIdx = Math.min(config.endIdx, maxIndex);
+        } else {
+            const meTrack = context.allTracks.get(config.trackId);
+            if (meTrack) {
+                const barrier = context.constraintManager.getBarrierIndex(meTrack, context.allTracks);
+                if (barrier !== null) {
+                    wallIdx = barrier;
                 }
-                // If we haven't done any work today, we must wrap around
-            } else {
-                const linesProcessed = context.cumulativeArray[stopIdx] - currentCum;
-                results.push({
-                    startIdx: currentIdx,
-                    endIdx: stopIdx,
-                    start: context.quranRepo.getLocationFromIndex(currentIdx, context.indexMap),
-                    end: context.quranRepo.getLocationFromIndex(stopIdx, context.indexMap),
-                    linesProcessed: parseFloat(linesProcessed.toFixed(2)),
-                    flags: hitWall ? ['review', 'reset'] : ['review']
-                });
-                amountLeft -= linesProcessed;
-                currentIdx = stopIdx;
-            }
-
-            if (hitWall) {
-                // Wrap around completely
-                currentIdx = 0;
-                didReset = true;
-                if (wallIdx === 0) break; // Don't infinite loop if memory pool is 0
-                if (originalStartIdx === 0 && results.length > 0) break; // Prevent double-looping empty space in one day
-            } else {
-                break; // Handled the whole amount without hitting the wall
             }
         }
 
-        if (results.length === 0) return null;
-        if (results.length === 1) return results[0];
-        return results;
+        // Guard: nothing to review (pool is empty)
+        if (wallIdx <= 0) return null;
+        if (currentIdx >= wallIdx) {
+            // Already at or past the wall — need a reset.
+            // Return null; commitStep from previous day should have reset.
+            // If we're still here, force a reset result.
+            return null;
+        }
+
+        // Calculate target position
+        const currentCum = currentIdx > 0 ? context.cumulativeArray[currentIdx - 1] : 0;
+        const targetCum = currentCum + config.amount;
+
+        let stopIdx = findExponentialStopIndex(
+            context.cumulativeArray,
+            targetCum,
+            currentIdx,
+            Math.min(wallIdx, maxIndex)
+        );
+
+        // Clamp to wall
+        let hitWall = false;
+        if (stopIdx >= wallIdx) {
+            stopIdx = wallIdx;
+            hitWall = true;
+        }
+
+        // No movement possible
+        if (stopIdx <= currentIdx) {
+            return null;
+        }
+
+        const linesProcessed = context.cumulativeArray[stopIdx] - currentCum;
+
+        return {
+            startIdx: currentIdx,
+            endIdx: stopIdx,
+            start: context.quranRepo.getLocationFromIndex(currentIdx, context.indexMap),
+            end: context.quranRepo.getLocationFromIndex(stopIdx, context.indexMap),
+            linesProcessed: parseFloat(linesProcessed.toFixed(2)),
+            flags: hitWall ? ['review', 'reset'] : ['review']
+        };
     }
 }

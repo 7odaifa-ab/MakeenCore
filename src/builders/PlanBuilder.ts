@@ -3,7 +3,7 @@ import { TrackManager } from '../core/TrackManager';
 import { PlanMode, ScheduleConfig, LocationConfig, TrackRequest } from './PlanTypes';
 import { HifzSystem } from './HifzSystem';
 import { QuranRepository } from '../core/QuranRepository';
-import { WindowMode } from '../core/constants';
+import { WindowMode, TrackId } from '../core/constants';
 import { PlanError, PlanErrorCode, Severity } from '../errors';
 
 /**
@@ -50,10 +50,10 @@ export class PlanBuilder {
     }
 
 
-    public addMajorReview(amountLines: number, startLocation?: LocationConfig): PlanBuilder {
+    public addMajorReview(amountLines: number, startLocation?: LocationConfig, endLocation?: LocationConfig): PlanBuilder {
         // ... (Logic unchanged)
         if (this.currentMode === 'NONE') this.currentMode = 'HIFZ_ECOSYSTEM';
-        this.requests.push({ type: 'MAJOR_REVIEW', params: { amountLines, startLocation } });
+        this.requests.push({ type: 'MAJOR_REVIEW', params: { amountLines, startLocation, endLocation } });
         return this;
     }
 
@@ -81,11 +81,12 @@ export class PlanBuilder {
             limitDays: this.scheduleConfig.limitDays || 0,
             endDate: this.scheduleConfig.endDate,
             isReverse: this.scheduleConfig.isReverse || false,
-            // 🧠 Pedagogical constraints
+            // Pedagogical constraints
             maxAyahPerDay: this.scheduleConfig.maxAyahPerDay,
             sequentialSurahMode: this.scheduleConfig.sequentialSurahMode,
+            strictSequentialMode: this.scheduleConfig.strictSequentialMode,
             consolidationDayInterval: this.scheduleConfig.consolidationDayInterval
-        }, repository); // 👈 Passing the dependency
+        }, repository); // Passing the dependency
 
         const context = { isReverse: this.scheduleConfig.isReverse || false };
 
@@ -95,6 +96,8 @@ export class PlanBuilder {
             'MAJOR_REVIEW': 3
         };
         this.requests.sort((a, b) => priorityMap[a.type] - priorityMap[b.type]);
+
+        let majorReviewCounter = TrackId.MAJOR_REVIEW;
 
         this.requests.forEach(req => {
             switch (req.type) {
@@ -119,7 +122,9 @@ export class PlanBuilder {
                         manager,
                         context,
                         req.params.amountLines,
-                        req.params.startLocation
+                        majorReviewCounter++,
+                        req.params.startLocation,
+                        req.params.endLocation
                     );
                     break;
             }

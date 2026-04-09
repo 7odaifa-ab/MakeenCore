@@ -79,26 +79,36 @@ export class HifzSystem {
         manager: TrackManager,
         context: BuilderContext,
         amountLines: number,
-        start?: LocationConfig
+        trackId: number,
+        start?: LocationConfig,
+        end?: LocationConfig
     ) {
         const repo = this.getRepo();
         let startIdx = 0;
+        let endIdx: number | undefined = undefined;
+
         if (start) {
             startIdx = repo.getIndexFromLocation(start.surah, start.ayah, context.isReverse);
+        }
+        if (end) {
+            endIdx = repo.getIndexFromLocation(end.surah, end.ayah, context.isReverse);
+        }
+
+        if (endIdx !== undefined && startIdx >= endIdx) {
+            throw new PlanError(
+                PlanErrorCode.START_AFTER_END,
+                Severity.ERROR,
+                `موقع البداية (${startIdx}) بعد موقع النهاية (${endIdx}) للمراجعة الكبرى.`,
+                { startIdx, endIdx }
+            );
         }
 
         // ─────────────────────────────────────────────────────────────
         // 🛡️ VALIDATION: Major Review must not start ahead of Hifz
-        //
-        // "Ahead" = higher index in the cumulative array of this direction.
-        // A higher index means the position is further along the memorization
-        // path — i.e., material that has NOT been memorized yet.
-        //
-        // If Major Review starts beyond Hifz's starting position,
-        // it would be reviewing content the student hasn't learned,
-        // which is a logical impossibility.
+        // (Only apply this constraint if there is no explicit endIdx, 
+        //  since explicit endIdx implies independent Khana loops)
         // ─────────────────────────────────────────────────────────────
-        if (manager.hasTrack(TrackId.HIFZ)) {
+        if (endIdx === undefined && manager.hasTrack(TrackId.HIFZ)) {
             const hifzTrack = manager.getTrack(TrackId.HIFZ);
             if (hifzTrack && startIdx > hifzTrack.state.currentIdx) {
                 const hifzLoc = repo.getLocationFromIndex(
@@ -123,31 +133,36 @@ export class HifzSystem {
             }
         }
 
+        const trackName = trackId === TrackId.MAJOR_REVIEW ? "مراجعة كبرى" : `مراجعة كبرى ${trackId - TrackId.MAJOR_REVIEW + 1}`;
         const track = new LoopingTrack(
-            TrackId.MAJOR_REVIEW,
-            "مراجعة كبرى",
+            trackId,
+            trackName,
             startIdx,
-            amountLines
+            amountLines,
+            endIdx
         );
         manager.addTrack(track);
 
-        const constraintManager = manager.getConstraintManager();
+        // If user defined a specific end loop boundary, it does NOT get bounded by Hifz progress.
+        if (endIdx === undefined) {
+            const constraintManager = manager.getConstraintManager();
 
-        if (manager.hasTrack(TrackId.MINOR_REVIEW)) {
-            constraintManager.addConstraint(new WallConstraint(
-                TrackId.MAJOR_REVIEW,
-                TrackId.MINOR_REVIEW,
-                true,
-                1,
-                TrackId.HIFZ
-            ));
-        } else if (manager.hasTrack(TrackId.HIFZ)) {
-            constraintManager.addConstraint(new WallConstraint(
-                TrackId.MAJOR_REVIEW,
-                TrackId.HIFZ,
-                true,
-                1
-            ));
+            if (manager.hasTrack(TrackId.MINOR_REVIEW)) {
+                constraintManager.addConstraint(new WallConstraint(
+                    trackId,
+                    TrackId.MINOR_REVIEW,
+                    true,
+                    1,
+                    TrackId.HIFZ
+                ));
+            } else if (manager.hasTrack(TrackId.HIFZ)) {
+                constraintManager.addConstraint(new WallConstraint(
+                    trackId,
+                    TrackId.HIFZ,
+                    true,
+                    1
+                ));
+            }
         }
     }
 

@@ -9,6 +9,7 @@ export interface ITrack {
     readonly id: number;
     readonly name: string;
     readonly type: string;
+    readonly resetIdx: number;
     state: TrackState;
     calculateNextStep(context: PlanContext): StepResult | StepResult[] | null;
     // 🚀 FIX: Accept simulation date to ensure history accuracy
@@ -23,6 +24,7 @@ export interface ITrack {
  */
 export abstract class BaseTrack implements ITrack {
     public state: TrackState;
+    public readonly resetIdx: number;
 
     constructor(
         public readonly id: number,
@@ -32,6 +34,7 @@ export abstract class BaseTrack implements ITrack {
         protected config: any,
         startIdx: number = 0
     ) {
+        this.resetIdx = startIdx;
         this.state = {
             currentIdx: startIdx,
             history: [],
@@ -60,7 +63,7 @@ export abstract class BaseTrack implements ITrack {
 
         // Update position
         if (step.flags?.includes('reset')) {
-            this.state.currentIdx = 0; // Loop back to start
+            this.state.currentIdx = this.resetIdx; // Loop back to configured start (not always 0)
         } else if (step.endIdx >= step.startIdx) {
             // When completed, stay at the last valid index (never go out of bounds).
             // WallConstraint (useHistory:false) reads currentIdx directly on the Quran array,

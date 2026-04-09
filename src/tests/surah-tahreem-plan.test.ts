@@ -22,6 +22,7 @@ describe('Surah At-Tahrim Plan Generation', () => {
 
         const result = MakenEngine.generatePlan(payload);
 
+        if (!result.success) console.error("TEST FAILED:", result);
         expect(result.success).toBe(true);
         expect(result.data.plan.length).toBeGreaterThan(0);
         
