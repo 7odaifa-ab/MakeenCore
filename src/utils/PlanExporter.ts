@@ -2,13 +2,8 @@
 import * as ExcelJS from 'exceljs';
 import { PlanDay, LocationObj, PlanEvent } from '../core/types';
 import { QuranRepository } from '../core/QuranRepository';
-import { TrackId } from '../core/constants'; // 👈 Enum
+import { TrackId } from '../core/constants'; // Enum
 
-/**
- * PlanExporter
- * * Utility for exporting plans to Excel and console.
- * * 🚀 REFACTORED: Adapts to the dynamic 'events' array structure.
- */
 export class PlanExporter {
     private quranRepo: QuranRepository;
 
@@ -20,19 +15,25 @@ export class PlanExporter {
         const name = this.quranRepo.getSurahName(loc.surah);
         return `${name} (${loc.ayah})`;
     }
-    
+
     private formatLoc(loc: LocationObj): string {
         return this.formatLocation(loc);
     }
 
-    /**
-     * Finds a specific event in the day's event list.
-     */
+    private formatEventRange(event: PlanEvent): string {
+        const status = event.data.is_reset ? ' 🔄' : '';
+        return `${this.formatLoc(event.data.start)} ⬅️ ${this.formatLoc(event.data.end)}${status}`;
+    }
+
     private findEvent(day: PlanDay, trackId: TrackId): PlanEvent | undefined {
         return day.events.find(e => e.trackId === trackId);
     }
 
-    async exportToExcel(plan: PlanDay[], fileName: string = "QuranPlan.xlsx") {
+    private findMajorEvents(day: PlanDay): PlanEvent[] {
+        return day.events.filter(e => e.trackId >= TrackId.MAJOR_REVIEW);
+    }
+
+    async exportToExcel(plan: PlanDay[], fileName: string = 'QuranPlan.xlsx') {
         const workbook = new ExcelJS.Workbook();
         workbook.creator = 'Quran Planning Engine';
         workbook.created = new Date();
@@ -47,10 +48,9 @@ export class PlanExporter {
             { header: 'اليوم', key: 'dayName', width: 10 },
             { header: 'الحفظ الجديد', key: 'hifz', width: 35 },
             { header: 'مراجعة صغرى', key: 'minor', width: 35 },
-            { header: 'مراجعة كبرى', key: 'major', width: 35 },
+            { header: 'مراجعة كبرى', key: 'major', width: 50 },
         ];
 
-        // Header Styling... (unchanged)
         const headerRow = worksheet.getRow(1);
         headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
         headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E86C1' } };
@@ -69,25 +69,25 @@ export class PlanExporter {
                 major: ''
             };
 
-            // 🚀 Dynamic Mapping: Extract events back to columns
             const hifzEvt = this.findEvent(day, TrackId.HIFZ);
             const minorEvt = this.findEvent(day, TrackId.MINOR_REVIEW);
-            const majorEvt = this.findEvent(day, TrackId.MAJOR_REVIEW);
+            const majorEvts = this.findMajorEvents(day);
 
             if (hifzEvt) {
-                rowData.hifz = `${this.formatLoc(hifzEvt.data.start)} ⬅️ ${this.formatLoc(hifzEvt.data.end)}`;
+                rowData.hifz = this.formatEventRange(hifzEvt);
             }
             if (minorEvt) {
-                rowData.minor = `${this.formatLoc(minorEvt.data.start)} ⬅️ ${this.formatLoc(minorEvt.data.end)}`;
+                rowData.minor = this.formatEventRange(minorEvt);
             }
-            if (majorEvt) {
-                const status = majorEvt.data.is_reset ? ' 🔄' : '';
-                rowData.major = `${this.formatLoc(majorEvt.data.start)} ⬅️ ${this.formatLoc(majorEvt.data.end)}${status}`;
+            if (majorEvts.length > 0) {
+                rowData.major = majorEvts
+                    .map((evt) => `${evt.trackName}: ${this.formatEventRange(evt)}`)
+                    .join('\n');
             }
 
             const row = worksheet.addRow(rowData);
             row.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-            
+
             if (day.dayNum % 2 === 0) {
                 row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F4F4' } };
             }
@@ -96,7 +96,6 @@ export class PlanExporter {
             }
         }
 
-        // Borders... (unchanged)
         worksheet.eachRow((row) => {
             row.eachCell((cell) => {
                 cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
@@ -112,44 +111,38 @@ export class PlanExporter {
         console.log("=".repeat(50));
         console.log("   Quran Planning Engine - Daily Plan");
         console.log("=".repeat(50));
-        
+
         const daysAr = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        
+
         plan.forEach(day => {
             const dayName = daysAr[day.date.getDay()];
             console.log(`\n   Day ${day.dayNum} | ${day.date.toISOString().split('T')[0]} (${dayName})`);
             console.log("   ".repeat(15));
-            
+
             if (day.events.length === 0) {
                 console.log("   (Rest day - no tasks)");
             } else {
                 day.events.forEach(evt => {
-                    let icon = '   ';
-                    let trackType = '';
-                    
+                    let trackType = evt.trackName;
+
                     if (evt.trackId === TrackId.HIFZ) {
-                        icon = '   ';
                         trackType = 'New Memorization';
-                    }
-                    else if (evt.trackId === TrackId.MINOR_REVIEW) {
-                        icon = '   ';
+                    } else if (evt.trackId === TrackId.MINOR_REVIEW) {
                         trackType = 'Minor Review';
-                    }
-                    else if (evt.trackId === TrackId.MAJOR_REVIEW) {
-                        icon = '   ';
+                    } else if (evt.trackId === TrackId.MAJOR_REVIEW) {
                         trackType = 'Major Review';
                     }
 
                     const resetStr = evt.data.is_reset ? ' [RESET]' : '';
                     const formattedStart = this.formatLoc(evt.data.start);
                     const formattedEnd = this.formatLoc(evt.data.end);
-                    
-                    console.log(`   ${icon} ${trackType}: ${formattedStart} -> ${formattedEnd}${resetStr}`);
+
+                    console.log(`    ${trackType}: ${formattedStart} -> ${formattedEnd}${resetStr}`);
                 });
             }
             console.log("   " + "-".repeat(45));
         });
-        
+
         console.log("\n" + "=".repeat(50));
         console.log("   End of Plan Preview");
         console.log("=".repeat(50));
