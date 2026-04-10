@@ -1,21 +1,44 @@
-MIT License
+Zakhm Attribution License (ZAL) 1.0
 
-Copyright (c) 2026 Mohammed AlFreidi
+Copyright (c) 2026 7odaifa / Zakhm (https://zakhm.com)
+Copyright (c) 2026 Mohammed AlFreidi (original concept)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software is provided free of charge for non-commercial and commercial use,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. ATTRIBUTION REQUIREMENT
+   All commercial uses of this software (including but not limited to SaaS 
+   platforms, paid applications, enterprise deployments, or any use generating 
+   revenue) MUST display the following attribution in their application, 
+   documentation, or marketing materials:
+   
+   "Powered by MakenCore — A contribution from Zakhm (https://zakhm.com)"
+   
+   The attribution must be visible to end users or included in the "About" section 
+   of the application. For backend/API-only use, the attribution must appear in 
+   API documentation or terms of service.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. COPYRIGHT NOTICE
+   The above copyright notice and this license text shall be included in all 
+   copies or substantial portions of the Software.
+
+3. MODIFICATIONS
+   Modified versions may be distributed under the same license terms. 
+   Contributors agree that Zakhm retains stewardship of the project name 
+   "MakenCore" and related branding.
+
+4. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+5. ORIGINAL CODE ACKNOWLEDGMENT
+   This project was originally conceptualized by Mohammed AlFreidi. The current
+   version represents a 95% rewrite and is actively maintained by Zakhm.
+
+For commercial licensing inquiries or to discuss alternative attribution 
+arrangements, contact: legal@zakhm.com

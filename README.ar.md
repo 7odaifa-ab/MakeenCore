@@ -1,80 +1,203 @@
-# MakenCore — محرك التخطيط القرآني
+# MakenCore
 
-**MakenCore** هو محرك تخطيط (Scheduling Engine) مستقل، مكتوب بلغة TypeScript، مصمم لتوليد جداول حفظ ومراجعة القرآن الكريم بشكل قطعي ودقيق. المحرك مصمم ليتم استيراده كمكتبة NPM في المنصات البرمجية (مثل NestJS) لتوفير منطق الأعمال الخاص بالتخطيط بشكل معزول.
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakenCore)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![English](https://img.shields.io/badge/lang-English-green)](./README.md)
+[![Zakhm](https://img.shields.io/badge/بواسطة-Zakhm-9cf)](https://zakhm.com)
 
-![MakenCore](https://img.shields.io/badge/Status-Production%20Ready-success)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+> محرك تخطيط قطعي مكتوب بلغة TypeScript لتوليد خطط حفظ ومراجعة القرآن الكريم.
 
-## القدرات الجوهرية (Core Capabilities)
-- **التخطيط القطعي:** موازنة الأحمال بين المسارات المتعددة (حفظ، مراجعة صغرى، مراجعة كبرى) وتوليد الأحداث بناءً على القواعد البرمجية.
-- **التحقق من البيانات المرجعية:** يعتمد على نظام الفهرسة التراكمية (prefix-sum) بسرعة $O(1)$ باستخدام رواية حفص (الإصدار 18) لضمان دقة الصفحات والفواصل الموضوعية.
-- **سلسلة القواعد (Rule Pipeline):** معمارية تضمن سلامة الآيات (Ayah Integrity)، والانجذاب لنهاية السورة، ومحاذاة الصفحات، والوقف الموضوعي.
-- **التشغيل عديم الحالة (Stateless):** مدخلات JSON متمثلة في (`CreatePlanPreviewRequestDTO`) ومخرجات JSON متمثلة في (`CreatePlanPreviewResponseDTO`).
-
-## 📖 التوثيق الإرشادي
-- **[دليل المستخدم (User Guide)](./USER_GUIDE.md):** تفاصيل منطق الحفظ، مسارات المراجعة، وأيام الاستدراك.
-- **[وثيقة المتطلبات الفنية (PRD)](./doc/planning-engine/planning-engine-prd.md):** القواعد الرياضية والمعمارية الهندسية.
-- **[عقود الربط البرمجي (API contracts)](./src/infrastructure/api/contracts.ts):** مرجع الـ DTO لعمليات الدمج.
+يُنتج MakenCore خططاً يومية توازن بين **الحفظ الجديد**، **المراجعة الصغرى** (المواد الحديثة)، و**المراجعة الكبرى** (مراجعة الدورة الكاملة). مصمم كمكتبة مستقلة للدمج في الأنظمة الخلفية (NestJS, Express, إلخ).
 
 ---
 
-## 📦 التثبيت والاستخدام
+## البداية السريعة
 
-يُصدر **MakenCore** فئة واحدة أساسية وهي `MakenEngine` بجانب الـ DTOs والأنواع (Types) اللازمة للاستخدام في تطبيقك.
+### التثبيت
 
-### للدمج عبر API (NestJS, Express, إلخ)
-الواجهة الأساسية للتفاعل مع المحرك هي فئة `MakenEngine`.
+```bash
+npm install maken-core
+```
+
+### مثال بسيط
 
 ```typescript
-import { 
-    MakenEngine, 
-    CreatePlanPreviewRequestDTO 
-} from 'maken-core';
+import { MakenEngine } from 'maken-core';
 
-// 1. بناء طلب الـ DTO
-const payload: CreatePlanPreviewRequestDTO = {
-    name: "مكثف رمضان",
-    direction: "FORWARD", // أو 'REVERSE' للحفظ التنازلي
+const result = MakenEngine.generatePlan({
+    name: "حفظ 30 يوماً",
+    direction: "FORWARD",
     daysPerWeek: 5,
-    tracks: [
-        {
-            type: "HIFZ",
-            priority: 1,
-            amountUnit: "LINES",
-            amountValue: 15,
-            start: { surah: 1, ayah: 1 }
-        }
-    ],
-    startDate: "2026-03-30"
-};
-
-// 2. تنفيذ منطق التخطيط
-const result = MakenEngine.generatePlan(payload);
+    tracks: [{
+        type: "HIFZ",
+        priority: 1,
+        amountUnit: "LINES",
+        amountValue: 10,
+        start: { surah: 1, ayah: 1 }
+    }],
+    startDate: "2026-04-01"
+});
 
 if (result.success) {
+    console.log(`الخطة: ${result.data.totalDays} يوماً`);
+    console.log(result.data.plan); // مصفوفة الأحداث اليومية
+}
+```
+
+### نمط البناء (متقدم)
+
+```typescript
+import { PlanBuilder, WindowMode } from 'maken-core';
+
+const manager = new PlanBuilder()
+    .setSchedule({
+        startDate: "2026-04-01",
+        daysPerWeek: 6,
+        isReverse: false,
+        maxAyahPerDay: 8
+    })
+    .planByDailyAmount({
+        from: { surah: 2, ayah: 1 },
+        to: { surah: 2, ayah: 286 },
+        dailyLines: 12
+    })
+    .addMinorReview(5, WindowMode.GRADUAL)
+    .stopWhenCompleted()
+    .build();
+
+const days = manager.generatePlan();
+```
+
+---
+
+## القدرات الجوهرية
+
+| الميزة | الوصف |
+|--------|-------|
+| **جدولة متعددة المسارات** | حفظ (جديد)، مراجعة صغرى (حديث)، مراجعة كبرى (دورة كاملة) |
+| **فهرسة قرآنية دقيقة** | حسابات التجمع التراكمي (prefix-sum) لأي مدى |
+| **قواعد تربوية** | سلامة الآيات، استمرارية السور، أيام التقوية |
+| **أوضاع التخطيط** | بالمدة ("أنهِ في X يوماً") أو بالمقدار اليومي ("Y سطر/يوم") |
+| **تصميم مكتبة أولاً** | TypeScript نقية، بدون تبعيات، مخرجات قطعية |
+
+---
+
+## الإعدادات
+
+### خيارات الجدولة
+
+```typescript
+.setSchedule({
+    startDate: "2026-04-01",      // تاريخ ISO
+    daysPerWeek: 5,                // 1-7
+    isReverse: false,              // false = الفاتحة → الناس
+    maxAyahPerDay: 10,             // الحد الأقصى (5-20)
+    sequentialSurahMode: true,     // إكمال السورة قبل التالية
+    strictSequentialMode: false,   // عدم الانتقال حتى 100% إكمال
+    consolidationDayInterval: 6,   // كل N يوم = مراجعة فقط
+    surahBoundedMinorReview: false, // المراجعة الصغرى ضمن السورة الحالية
+    minorReviewPagesCount: 5       // عدد الصفحات للمراجعة (15 سطر = صفحة)
+})
+```
+
+| الخيار | النوع | الافتراضي | الوصف |
+|--------|-------|-----------|-------|
+| `startDate` | string | مطلوب | تاريخ بدء الخطة (YYYY-MM-DD) |
+| `daysPerWeek` | number | مطلوب | أيام الدراسة في الأسبوع |
+| `isReverse` | boolean | false | الاتجاه: true = الناس → الفاتحة |
+| `maxAyahPerDay` | number | 10 | الحد الأقصى للحفظ اليومي |
+| `sequentialSurahMode` | boolean | true | إكمال السورة قبل البدء بالتالية |
+| `strictSequentialMode` | boolean | false | عدم تغيير السورة حتى 100% إكمال |
+| `consolidationDayInterval` | number | 6 | فاصل أيام المراجعة فقط (0=معطل) |
+| `surahBoundedMinorReview` | boolean | false | المراجعة الصغرى ضمن السورة الحالية |
+| `minorReviewPagesCount` | number | — | مقدار المراجعة بالصفحات |
+
+---
+
+## أوضاع التخطيط
+
+### 1. التخطيط بالمدة
+
+تُقدم: `from`، `to`، `durationDays`، `daysPerWeek`  
+المحرك يُنتج: `dailyLines`، `limitDays`
+
+```typescript
+const manager = new PlanBuilder()
+    .setSchedule({
+        startDate: '2026-02-01',
+        daysPerWeek: 5,
+        isReverse: true,
+        maxAyahPerDay: 5
+    })
+    .planByDuration({
+        from: { surah: 66, ayah: 1 },
+        to: { surah: 58, ayah: 8 },
+        durationDays: 30
+    })
+    .addMinorReview(3, WindowMode.GRADUAL)
+    .addMajorReview(15 * 5, { surah: 114, ayah: 1 })
+    .stopWhenCompleted()
+    .build();
+```
+
+### 2. التخطيط بالمقدار اليومي
+
+تُقدم: `from`، `to`، `dailyLines`، `daysPerWeek`  
+المحرك يُنتج: عدد أيام الدراسة المطلوبة، `limitDays`
+
+```typescript
+const manager = new PlanBuilder()
+    .setSchedule({
+        startDate: '2026-02-01',
+        daysPerWeek: 6,
+        isReverse: true,
+        maxAyahPerDay: 12
+    })
+    .planByDailyAmount({
+        from: { surah: 66, ayah: 1 },
+        to: { surah: 55, ayah: 78 },
+        dailyLines: 14
+    })
+    .addMinorReview(7, WindowMode.GRADUAL)
+    .addMajorReview(15 * 10, { surah: 114, ayah: 1 })
+    .stopWhenCompleted()
+    .build();
+```
+
+---
+
+## المخرجات
+
+يُعيد المحرك إدخالات الخطة اليومية مع تصنيفات الأحداث:
+
+| نوع الحدث | الوصف |
+|-----------|-------|
+| `MEMORIZATION` | المادة الجديدة للحفظ |
+| `REVIEW` | أحداث المراجعة المجدولة |
+| `CATCH_UP` | أحداث التجاوز/التعديل |
+| `BREAK` | أيام الراحة/التقوية |
+
+```typescript
+if (result.success) {
     const planDays = result.data.plan;
-    console.log(`الخطة تمتد لـ ${result.data.totalDays} يوماً`);
-    // قم بتمرير `planDays` إلى خدمة Prisma لحفظها في قاعدة البيانات!
+    // احفظ في قاعدة البيانات (Prisma, إلخ)
 }
 ```
 
 ---
 
-## 🗃️ حدود التطبيق (Application Boundaries)
+## التوثيق
 
-تم تصميم MakenCore ليفصل بين منطق التخطيط وبين العرض وقواعد البيانات.
-
-### 1. العرض والتصدير
-توليد ملفات PDF أو Excel بشكل رسمي هو **خارج نطاق** هذا المحرك لتجنب تضخم حجم الحزمة. يقوم المحرك بإرجاع بيانات JSON خام (`PlanDay[]`). تطبيقك (NestJS أو React) هو المسؤول عن تمرير هذه البيانات إلى مكتبات مثل `pdfkit` أو `exceljs`.
-
-### 2. الحفظ في قاعدة البيانات
-يجب على تطبيقك حفظ مخرجات MakenCore. تتوفر مصفوفة [استراتيجية الربط مع Prisma](doc/planning-engine/planning-engine-prisma-schema-draft.md) في مجلد التوثيق لمساعدتك على ربط الأحداث بقاعدة PostgreSQL فوراً.
+| المستند | الغرض |
+|---------|-------|
+| [عقود الربط البرمجي](doc/planning-engine/planning-engine-api-contracts.md) | عقود التكامل مع TypeScript |
+| [أوضاع التخطيط والمراحل](doc/planning-engine/planning-modes-and-phases.md) | مراحل التنفيذ والمعالم |
+| [دليل القواعد التربوية](doc/planning-engine/pedagogical-rules-guide.md) | سلوك القواعد والإعدادات |
+| [وثيقة المتطلبات (PRD)](doc/planning-engine/planning-engine-prd.md) | تفاصيل المنتج والمعمارية |
 
 ---
 
-## 🧪 الاختبارات
-
-المحرك مدعوم بمجموعة اختبارات قطعية باستخدام Vitest لتغطية تراجع القواعد، موازنة الأحمال، والتحقق من صحة البيانات.
+## الاختبارات
 
 ```bash
 npm install
@@ -82,3 +205,36 @@ npm run test:vitest
 ```
 
 **إجمالي الاختبارات الآلية:** 37/37 (ناجحة بنسبة 100%).
+
+---
+
+## ملاحظات لمستخدمي المكتبة
+
+- مشغلات السيناريوهات وبرامج Excel في `/src` للاختبار الداخلي فقط
+- للإنتاج: استخدم `planDays` وقم بالحفظ في تطبيقك المضيف
+- التفاصيل التقنية الكاملة في مجلد `/doc`
+
+---
+
+<div align="center">
+
+## صُنع بـ 💚 بواسطة Zakhm
+
+<table>
+<tr>
+<td width="100" align="center">
+<img src="https://via.placeholder.com/80x80/9cf/333?text=Z" alt="شعار Zakhm" width="80" height="80" style="border-radius: 12px;">
+</td>
+<td>
+
+**[Zakhm](https://zakhm.com)** — نُمكّن التعليم الإسلامي من خلال التقنية.
+
+نؤمن بأن الأدوات الممتازة يجب أن تكون متاحة للجميع. استخدم MakenCore بحرية، وفكّر بالمساهمة لمساعدة المجتمع على النمو.
+
+📄 مرخص بموجب [رخصة Zakhm Attribution (ZAL) 1.0](./LICENSE)
+
+</td>
+</tr>
+</table>
+
+</div>
