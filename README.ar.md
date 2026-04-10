@@ -222,6 +222,9 @@ npm run test:vitest
 
 <table dir="rtl">
 <tr>
+<td width="100" align="center">
+<img src="https://github.com/user-attachments/assets/9223eb9d-920c-4ae6-8fb5-8ab3883ee105" alt="شعار زخم" width="80" height="80" style="border-radius: 12px;">
+</td>
 <td align="right">
 
 **[Zakhm](https://zakhm.sa)** — نُمكّن التعليم الإسلامي من خلال التقنية.
@@ -230,9 +233,6 @@ npm run test:vitest
 
 📄 مرخص بموجب [رخصة Zakhm Attribution (ZAL) 1.0](./LICENSE)
 
-</td>
-<td width="100" align="center">
-<img src="https://github.com/user-attachments/assets/9223eb9d-920c-4ae6-8fb5-8ab3883ee105" alt="شعار زخم" width="80" height="80" style="border-radius: 12px;">
 </td>
 </tr>
 </table>
