@@ -1,13 +1,13 @@
-# MakenCore
+# MakeenCore
 
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakenCore)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakeenCore)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![Arabic](https://img.shields.io/badge/lang-العربية-green)](./README.ar.md)
 [![Zakhm](https://img.shields.io/badge/Made%20by-Zakhm-9cf)](https://zakhm.sa)
 
 > Deterministic TypeScript scheduling engine for Quran memorization (Hifz) and review tracking.
 
-MakenCore generates day-by-day study plans that balance **new memorization**, **minor review** (recent material), and **major review** (full-cycle review). Designed as a standalone library for integration into backend systems (NestJS, Express, etc.).
+MakeenCore generates day-by-day study plans that balance **new memorization**, **minor review** (recent material), and **major review** (full-cycle review). Designed as a standalone library for integration into backend systems (NestJS, Express, etc.).
 
 ---
 
@@ -16,15 +16,15 @@ MakenCore generates day-by-day study plans that balance **new memorization**, **
 ### Installation
 
 ```bash
-npm install maken-core
+npm install @zakhm_sa/makeen-core
 ```
 
 ### Minimal Example
 
 ```typescript
-import { MakenEngine } from 'maken-core';
+import { MakeenEngine } from '@zakhm_sa/makeen-core';
 
-const result = MakenEngine.generatePlan({
+const result = MakeenEngine.generatePlan({
     name: "30-Day Hifz",
     direction: "FORWARD",
     daysPerWeek: 5,
@@ -47,7 +47,7 @@ if (result.success) {
 ### Builder Pattern (Advanced)
 
 ```typescript
-import { PlanBuilder, WindowMode } from 'maken-core';
+import { PlanBuilder, WindowMode } from '@zakhm_sa/makeen-core';
 
 const manager = new PlanBuilder()
     .setSchedule({
@@ -229,7 +229,7 @@ npm run test:vitest
 
 **[Zakhm](https://zakhm.sa)** — Empowering Islamic education through technology.
 
-We believe great tools should be accessible to all. Use MakenCore freely, and consider contributing back to help the community grow.
+We believe great tools should be accessible to all. Use MakeenCore freely, and consider contributing back to help the community grow.
 
 📄 Licensed under [Zakhm Attribution License (ZAL) 1.0](./LICENSE)
 

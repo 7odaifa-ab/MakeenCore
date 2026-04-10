@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MakenEngine, CreatePlanPreviewRequestDTO } from '../index';
+import { MakeenEngine, CreatePlanPreviewRequestDTO } from '../index';
 
 describe('Surah At-Tahrim Plan Generation', () => {
     it('creates a plan starting from Surah At-Tahrim (66)', () => {
@@ -20,7 +20,7 @@ describe('Surah At-Tahrim Plan Generation', () => {
             startDate: '2026-04-08'
         };
 
-        const result = MakenEngine.generatePlan(payload);
+        const result = MakeenEngine.generatePlan(payload);
 
         if (!result.success) console.error("TEST FAILED:", result);
         expect(result.success).toBe(true);
@@ -67,7 +67,7 @@ describe('Surah At-Tahrim Plan Generation', () => {
             startDate: '2026-04-08'
         };
 
-        const result = MakenEngine.generatePlan(payload);
+        const result = MakeenEngine.generatePlan(payload);
 
         expect(result.success).toBe(true);
         expect(result.data.plan.length).toBeGreaterThan(0);

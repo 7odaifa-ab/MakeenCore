@@ -337,12 +337,12 @@ For direct library usage without HTTP API:
 
 ### Installation
 ```bash
-npm install maken-core
+npm install makeencore
 ```
 
 ### Quick Start
 ```typescript
-import { PlanBuilder, WindowMode } from 'maken-core';
+import { PlanBuilder, WindowMode } from 'makeencore';
 
 const builder = new PlanBuilder();
 
@@ -479,7 +479,7 @@ const completionMode = {
 For fine-grained control, you can configure individual rules:
 
 ```typescript
-import { RuleEngine, MaxAyahRule, SurahCompletionRule } from 'maken-core';
+import { RuleEngine, MaxAyahRule, SurahCompletionRule } from 'makeencore';
 
 // Custom rule engine with modified priorities
 const engine = new RuleEngine([

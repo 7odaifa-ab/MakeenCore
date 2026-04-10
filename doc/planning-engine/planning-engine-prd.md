@@ -6,7 +6,7 @@
 
 ## 1. Document Purpose
 
-This PRD defines the target product and technical direction for the next generation planning engine in the `MakenCore` project.
+This PRD defines the target product and technical direction for the next generation planning engine in the `MakeenCore` project.
 
 It is based on:
 

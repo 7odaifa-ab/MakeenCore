@@ -179,7 +179,7 @@ flags: ['memorization'] → MaxAyahRule enforced
 ### Programmatic (TypeScript)
 
 ```typescript
-import { PlanBuilder, WindowMode } from '@maken/core';
+import { PlanBuilder, WindowMode } from '@makeen/core';
 
 const manager = new PlanBuilder()
   .setSchedule({
@@ -285,7 +285,7 @@ import {
   PageAlignmentRule,
   ThematicHaltingRule,
   BalanceCorrectionRule
-} from '@maken/core';
+} from '@makeen/core';
 
 const engine = new RuleEngine([
   new AyahIntegrityRule(),

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document summarizes the current state of the `MakenCore` Quran planning engine, what has already been implemented, what has been validated, what remains open, and where public contributors can help next.
+This document summarizes the current state of the `MakeenCore` Quran planning engine, what has already been implemented, what has been validated, what remains open, and where public contributors can help next.
 
 It is intended as a publish-ready status reference for developers, reviewers, and community contributors reading the repository.
 
@@ -290,7 +290,7 @@ This project has completed the first stage strongly and has started entering the
 
 ## Summary
 
-The current state of `MakenCore` is:
+The current state of `MakeenCore` is:
 
 - a strong and organized planning engine
 - backed by an ordered pedagogical rule pipeline

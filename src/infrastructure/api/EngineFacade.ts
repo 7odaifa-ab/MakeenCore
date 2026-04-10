@@ -14,7 +14,7 @@ import { QuranRepository } from '../../core/QuranRepository';
 
 /**
  * EngineFacade
- * Top-level application boundary for consuming the MakenCore engine.
+ * Top-level application boundary for consuming the MakeenCore engine.
  * Maps standard API DTOs into domain logic execution and serializes output.
  */
 export class EngineFacade {
@@ -61,7 +61,7 @@ export class EngineFacade {
                         break;
                     default:
                         // Ignore unsupported track types in engine execution
-                        console.warn(`Tracking type ${track.type} is not yet supported in this version of MakenCore`);
+                        console.warn(`Tracking type ${track.type} is not yet supported in this version of MakeenCore`);
                         break;
                 }
             }
@@ -102,7 +102,7 @@ export class EngineFacade {
                 }
             };
         } catch (error) {
-            console.error("[MakenCore] EngineFacade payload execution failed:", error);
+            console.error("[MakeenCore] EngineFacade payload execution failed:", error);
             return {
                 success: false,
                 data: {

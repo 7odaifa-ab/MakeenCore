@@ -4,7 +4,7 @@ import { runScenario } from './scenarios/runScenario';
 
 function printHelp() {
     console.log(`
-MakenCore Scenario Launcher
+MakeenCore Scenario Launcher
 
 Usage:
 npm start
@@ -55,7 +55,7 @@ async function main() {
         return;
     }
 
-    console.log('\nMakenCore Scenario Launcher\n');
+    console.log('\nMakeenCore Scenario Launcher\n');
 
     try {
         if (isAllMode) {

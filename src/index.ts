@@ -1,6 +1,6 @@
 /**
  * -------------------------------------------------------------
- * MakenCore - Quran Planning Engine
+ * MakeenCore - Quran Planning Engine
  * Core Engine Entry Point for NPM Consuming Applications
  * ------------------------------------------------------------- 
  */
@@ -21,4 +21,4 @@ export * from './errors';
 export * from './infrastructure/api/contracts';
 
 // 4. Export Primary Execution Facade
-export { EngineFacade as MakenEngine } from './infrastructure/api/EngineFacade';
+export { EngineFacade as MakeenEngine } from './infrastructure/api/EngineFacade';

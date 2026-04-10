@@ -1,13 +1,13 @@
-# MakenCore
+# MakeenCore
 
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakenCore)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakeenCore)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![English](https://img.shields.io/badge/lang-English-green)](./README.md)
 [![Zakhm](https://img.shields.io/badge/بواسطة-Zakhm-9cf)](https://zakhm.sa)
 
 > محرك تخطيط قطعي مكتوب بلغة TypeScript لتوليد خطط حفظ ومراجعة القرآن الكريم.
 
-يُنتج MakenCore خططاً يومية توازن بين **الحفظ الجديد**، **المراجعة الصغرى** (المواد الحديثة)، و**المراجعة الكبرى** (مراجعة الدورة الكاملة). مصمم كمكتبة مستقلة للدمج في الأنظمة الخلفية (NestJS, Express, إلخ).
+يُنتج MakeenCore خططاً يومية توازن بين **الحفظ الجديد**، **المراجعة الصغرى** (المواد الحديثة)، و**المراجعة الكبرى** (مراجعة الدورة الكاملة). مصمم كمكتبة مستقلة للدمج في الأنظمة الخلفية (NestJS, Express, إلخ).
 
 ---
 
@@ -16,15 +16,15 @@
 ### التثبيت
 
 ```bash
-npm install maken-core
+npm install @zakhm_sa/makeen-core
 ```
 
 ### مثال بسيط
 
 ```typescript
-import { MakenEngine } from 'maken-core';
+import { MakeenEngine } from '@zakhm_sa/makeen-core';
 
-const result = MakenEngine.generatePlan({
+const result = MakeenEngine.generatePlan({
     name: "حفظ 30 يوماً",
     direction: "FORWARD",
     daysPerWeek: 5,
@@ -47,7 +47,7 @@ if (result.success) {
 ### نمط البناء (متقدم)
 
 ```typescript
-import { PlanBuilder, WindowMode } from 'maken-core';
+import { PlanBuilder, WindowMode } from '@zakhm_sa/makeen-core';
 
 const manager = new PlanBuilder()
     .setSchedule({
@@ -229,7 +229,7 @@ npm run test:vitest
 
 **[Zakhm](https://zakhm.sa)** — نُمكّن التعليم الإسلامي من خلال التقنية.
 
-نؤمن بأن الأدوات الممتازة يجب أن تكون متاحة للجميع. استخدم MakenCore بحرية، وفكّر بالمساهمة لمساعدة المجتمع على النمو.
+نؤمن بأن الأدوات الممتازة يجب أن تكون متاحة للجميع. استخدم MakeenCore بحرية، وفكّر بالمساهمة لمساعدة المجتمع على النمو.
 
 📄 مرخص بموجب [رخصة Zakhm Attribution (ZAL) 1.0](./LICENSE)
 

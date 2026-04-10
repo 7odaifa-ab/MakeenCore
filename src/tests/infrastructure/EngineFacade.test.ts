@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MakenEngine, CreatePlanPreviewRequestDTO, EstimateCompletionRequestDTO } from '../../../src/index';
+import { MakeenEngine, CreatePlanPreviewRequestDTO, EstimateCompletionRequestDTO } from '../../../src/index';
 
 describe('EngineFacade integration tests', () => {
     it('generates a plan correctly from DTO', () => {
@@ -20,7 +20,7 @@ describe('EngineFacade integration tests', () => {
             startDate: '2026-03-30'
         };
 
-        const result = MakenEngine.generatePlan(payload);
+        const result = MakeenEngine.generatePlan(payload);
 
         expect(result.success).toBe(true);
         expect(result.data.plan.length).toBeGreaterThan(0);
@@ -51,7 +51,7 @@ describe('EngineFacade integration tests', () => {
             startDate: '2026-03-30'
         };
 
-        const result = MakenEngine.estimateTimeline(payload);
+        const result = MakeenEngine.estimateTimeline(payload);
 
         expect(result.success).toBe(true);
         expect(result.data.estimatedDays).toBeGreaterThan(0);
@@ -59,7 +59,7 @@ describe('EngineFacade integration tests', () => {
     });
 
     it('runs dataset validation checks successfully', () => {
-        const result = MakenEngine.validateDataset();
+        const result = MakeenEngine.validateDataset();
 
         expect(result.success).toBe(true);
         expect(result.data.valid).toBe(true);

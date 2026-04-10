@@ -1,12 +1,12 @@
-# MakenCore User Guide 📖
+# MakeenCore User Guide 📖
 
-This guide explains the core scheduling logic and track types within **MakenCore** for Quran teachers and platform developers.
+This guide explains the core scheduling logic and track types within **MakeenCore** for Quran teachers and platform developers.
 
 ---
 
 ## 1. Core Scheduling Logic
 
-Every plan in MakenCore is built using one or more **Tracks**. Each track has a specific behavior and priority relative to others.
+Every plan in MakeenCore is built using one or more **Tracks**. Each track has a specific behavior and priority relative to others.
 
 ### 📗 Hifz Track (Primary / حفظ جديد)
 - **Logic:** Linear Movement.
@@ -31,7 +31,7 @@ Every plan in MakenCore is built using one or more **Tracks**. Each track has a 
 ## 2. Stabilization & Catch-Up Logic
 
 ### 🗓️ Weekly Catch-Up Day (يوم استدراك)
-MakenCore supports a `catchUpDay` configuration (e.g., Saturday).
+MakeenCore supports a `catchUpDay` configuration (e.g., Saturday).
 - **Behavior:** On this day, the **Hifz Track is frozen** (no new memorization).
 - **Consolidation:** The **Review Tracks (Minor & Major) continue to run**.
 - **Impact:** This allows students to stabilize their weekly progress without increasing cumulative load.
@@ -45,7 +45,7 @@ MakenCore supports a `catchUpDay` configuration (e.g., Saturday).
 
 ## 3. DTO & API Cheat Sheet
 
-To generate a plan using this logic, use the `MakenEngine` (or `EngineFacade`) with the following structure:
+To generate a plan using this logic, use the `MakeenEngine` (or `EngineFacade`) with the following structure:
 
 ```json
 {
