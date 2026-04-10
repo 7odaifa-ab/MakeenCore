@@ -1,6 +1,6 @@
 {
   "name": "@zakhm_sa/makeen-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Quran memorization planning engine — line-precise scheduling with mushaf spatial coordinates.",
   "author": "7odaifa-ab <hudaifa@zakhm.sa>",
   "contributors": [
