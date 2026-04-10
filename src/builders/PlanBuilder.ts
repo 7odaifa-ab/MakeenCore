@@ -213,7 +213,8 @@ export class PlanBuilder {
                     HifzSystem.createMinorReview(
                         manager,
                         req.params.lessonCount,
-                        req.params.mode
+                        req.params.mode,
+                        this.scheduleConfig
                     );
                     break;
                 case 'MAJOR_REVIEW':

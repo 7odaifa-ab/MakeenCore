@@ -40,6 +40,8 @@
     "start:review-only-reset-stress:excel": "ts-node src/main.ts --scenario=review-only-reset-stress --excel",
     "start:review-only": "ts-node src/main.ts --scenario=review-only",
     "start:review-only:excel": "ts-node src/main.ts --scenario=review-only --excel",
+    "start:quarter-page": "ts-node src/main.ts --scenario=quarter-page",
+    "start:quarter-page:excel": "ts-node src/main.ts --scenario=quarter-page --excel",
     "start:all": "ts-node src/main.ts --all",
     "start:all:excel": "ts-node src/main.ts --all --excel",
     "validate:scenarios": "ts-node src/tests/scenarioValidator.ts",

@@ -5,17 +5,17 @@ import { WindowTrack } from '../tracks/WindowTrack';
 import { LoopingTrack } from '../tracks/LoopingTrack';
 import { WallConstraint } from '../constraints/WallConstraint';
 import { QuranRepository } from '../core/QuranRepository';
-import { BuilderContext, LocationConfig } from './PlanTypes';
+import { BuilderContext, LocationConfig, ScheduleConfig } from './PlanTypes';
 import { ITrack } from '../tracks/BaseTrack';
 import { TrackId } from '../core/constants';
 import { WindowMode } from '../core/constants';
 import { PlanError, PlanErrorCode, Severity } from '../errors';
-
+import { SurahBoundedWindowStrategy } from '../strategies/SurahBoundedWindowStrategy';
 
 /**
  * HifzSystem
  * * Subsystem responsible for creating and wiring Hifz tracks.
- * * 🚀 REFACTORED: Uses TrackId Enum instead of Magic Numbers.
+ * * REFACTORED: Uses TrackId Enum instead of Magic Numbers.
  */
 export class HifzSystem {
 
@@ -63,16 +63,40 @@ export class HifzSystem {
     static createMinorReview(
         manager: TrackManager,
         lessonCount: number,
-        mode: WindowMode = WindowMode.GRADUAL  // ← default: سلوك قديم
+        mode: WindowMode = WindowMode.GRADUAL,  // ← default: سلوك قديم
+        scheduleConfig?: ScheduleConfig | null
     ) {
-        const track = new WindowTrack(
-            TrackId.MINOR_REVIEW,
-            "مراجعة صغرى",
-            TrackId.HIFZ,
-            lessonCount,
-            mode        // ← يُمرَّر للـ Track ثم للـ Strategy
-        );
-        manager.addTrack(track);
+        // Use surah-bounded strategy if enabled in schedule config
+        if (scheduleConfig?.surahBoundedMinorReview) {
+            const pagesCount = scheduleConfig.minorReviewPagesCount;
+            // Create custom track with surah-bounded strategy
+            const strategy = new SurahBoundedWindowStrategy();
+            const customConfig = {
+                pagesCount
+            };
+
+            const track = new WindowTrack(
+                TrackId.MINOR_REVIEW,
+                "مراجعة صغرى (محدودة بالسورة)",
+                TrackId.HIFZ,
+                pagesCount ?? lessonCount,
+                mode,
+                strategy,
+                customConfig
+            );
+
+            manager.addTrack(track);
+        } else {
+            // Use standard window strategy
+            const track = new WindowTrack(
+                TrackId.MINOR_REVIEW,
+                "مراجعة صغرى",
+                TrackId.HIFZ,
+                lessonCount,
+                mode        // ← يُمرَّر للـ Track ثم للـ Strategy
+            );
+            manager.addTrack(track);
+        }
     }
 
     static createMajorReview(

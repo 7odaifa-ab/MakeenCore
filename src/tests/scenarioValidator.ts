@@ -151,6 +151,14 @@ function validateScenario(scenario: ScenarioDefinition): ValidationResult {
                 checks.push('review-only produces review events');
                 break;
             }
+            case 'quarter-page': {
+                const memorization = getMemorizationEvents(plan);
+                assertCondition(memorization.length > 0, 'Quarter-page scenario must include memorization.');
+                assertCondition(getHifzCompletionState(scenario), 'Quarter-page scenario should complete the Hifz track.');
+                checks.push('quarter-page produces memorization');
+                checks.push('quarter-page completes Hifz');
+                break;
+            }
             default: {
                 checks.push('base validation only');
                 break;

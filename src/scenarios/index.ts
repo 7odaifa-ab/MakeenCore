@@ -5,6 +5,7 @@ import { createCompletionBeforeLimitScenario } from './completionBeforeLimit';
 import { createConsolidationAuditScenario } from './consolidationAudit';
 import { createDailyAmountAuditScenario } from './dailyAmountAudit';
 import { createIntermediateScenario } from './intermediate';
+import { createQuarterPageScenario } from './quarterPage';
 import { createReviewOnlyFiveAjzaScenario } from './reviewOnlyFiveAjza';
 import { createReviewOnlyResetStressScenario } from './reviewOnlyResetStress';
 import { createRulePipelineStressScenario } from './rulePipelineStress';
@@ -90,6 +91,16 @@ export const scenarios: ScenarioDefinition[] = [
             'Use it to stress-test review-only behavior until a dedicated review-only near-review track is added.'
         ],
         create: createReviewOnlyFiveAjzaScenario
+    },
+    {
+        key: 'quarter-page',
+        title: 'Quarter Page',
+        description: 'Page-based beginner plan: quarter page per day (~4 lines) for very slow, steady progress.',
+        notes: [
+            'Demonstrates page-based planning (quarter page) rather than line-based or ayah-based.',
+            'Use this to verify that the system handles small daily amounts with appropriate pedagogical constraints.'
+        ],
+        create: createQuarterPageScenario
     }
 ];
 

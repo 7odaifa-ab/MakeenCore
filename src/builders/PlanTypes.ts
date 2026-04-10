@@ -74,6 +74,19 @@ export interface ScheduleConfig {
      */
     strictSequentialMode?: boolean;
     
+    // MINOR REVIEW CONFIGURATION
+    /** 
+     * Surah-bounded minor review: review stays within current surah only.
+     * When enabled, minor review counter resets when hifz moves to a new surah.
+     */
+    surahBoundedMinorReview?: boolean;
+    /** 
+     * Minor review amount in pages (15 lines = 1 page).
+     * If specified, overrides lesson count for minor review.
+     * Recommended: 4-5 pages for weekly review coverage.
+     */
+    minorReviewPagesCount?: number;
+    
     // NOTE: Stop conditions are NOT defined here to keep ScheduleConfig pure.
     // Use PlanBuilder methods (e.g., .stopWhenCompleted()) instead.
 }
