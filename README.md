@@ -3,7 +3,7 @@
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakenCore)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![Arabic](https://img.shields.io/badge/lang-العربية-green)](./README.ar.md)
-[![Zakhm](https://img.shields.io/badge/Made%20by-Zakhm-9cf)](https://zakhm.com)
+[![Zakhm](https://img.shields.io/badge/Made%20by-Zakhm-9cf)](https://zakhm.sa)
 
 > Deterministic TypeScript scheduling engine for Quran memorization (Hifz) and review tracking.
 
@@ -227,7 +227,7 @@ npm run test:vitest
 </td>
 <td>
 
-**[Zakhm](https://zakhm.com)** — Empowering Islamic education through technology.
+**[Zakhm](https://zakhm.sa)** — Empowering Islamic education through technology.
 
 We believe great tools should be accessible to all. Use MakenCore freely, and consider contributing back to help the community grow.
 

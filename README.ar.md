@@ -3,7 +3,7 @@
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success)](https://github.com/7odaifa-ab/MakenCore)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![English](https://img.shields.io/badge/lang-English-green)](./README.md)
-[![Zakhm](https://img.shields.io/badge/بواسطة-Zakhm-9cf)](https://zakhm.com)
+[![Zakhm](https://img.shields.io/badge/بواسطة-Zakhm-9cf)](https://zakhm.sa)
 
 > محرك تخطيط قطعي مكتوب بلغة TypeScript لتوليد خطط حفظ ومراجعة القرآن الكريم.
 
@@ -227,7 +227,7 @@ npm run test:vitest
 </td>
 <td>
 
-**[Zakhm](https://zakhm.com)** — نُمكّن التعليم الإسلامي من خلال التقنية.
+**[Zakhm](https://zakhm.sa)** — نُمكّن التعليم الإسلامي من خلال التقنية.
 
 نؤمن بأن الأدوات الممتازة يجب أن تكون متاحة للجميع. استخدم MakenCore بحرية، وفكّر بالمساهمة لمساعدة المجتمع على النمو.
 
